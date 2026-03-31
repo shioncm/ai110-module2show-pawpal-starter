@@ -5,7 +5,14 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+
+Three core actions a user should be able to perform include: adding a pet, adding a task, and viewing today's tasks. 
+
 - What classes did you include, and what responsibilities did you assign to each?
+
+The four main objects, or classes, may include: Pet (attributes: pet type, name; methods: add, delete, get_tasks), Owner (attributes: name; methods: change_name, add_pet, remove_pet), Task (attributes: category, priority, duration, date_time, status; methods: add, delete, edit), Scheduler (attributes: tasks, available_time, pet, date; methods: generate_plan, view_today, get_summary)
+
+https://mermaid.live/edit#pako:eNqVU01v2zAM_SsCT_tIA7t248SHXdbjgA1oT4MBg7NYW6glGZKczAvy3yc5aWcn6bDpJD5Rj--R0h4qzQlyqFq09l5gbVAWivk1IuzrTpFh-yMU1scHZ4SqmUJJExQ5Lzty795PMENSb-kCrhpUNZWB4AU_FGpa9Bu5ayU9UemGjv5FzKwip5YczaA6cKF9tm9IePRn1zRU6KjWZriizghthJueCOUY7w06odUEvvccj0IS435TOiGvOLIOXW__zxNx4d6w81A1xPv2bJRfhHVs7MKZaNyiaPFHe6EuTMaP4czMaGTWXP9ogreuRTWTuBW0K53mOFxMw_ZSohkuDBxfYAFxAezm5lPYLZcffBC05Ezv1El9iKdp0TFtnGTOGjyl_WnFjPOV0J7OLXvS5m9X5vwSFdbka8ACaiM45M70tABJRmIIYex8Aa4h31LI_ZajeS6gUAd_p0P1XWv5cs3ovm4gf8LW-qjvQodP3_MVNaQ4mc-6Vw7y1e3IAfkefkIex6vlOks36zRL49s42qQLGHxSttxkd3erJEo3SbxKDwv4NRaNxmy_1kkSZeskTQ-_AeNfLSA
 
 **b. Design changes**
 
