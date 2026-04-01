@@ -33,7 +33,12 @@ Yes, my design did slightly change during implementation. The initial UML design
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+
+One tradeoff the scheduler makes is collecting all scheduled pending tasks into a list, and comparing every pair. This is a simple and correct solution, especially for a smaller number of tasks, but for a greater number of tasks (e.g. 1000 tasks) the runtime will be longer.
+
 - Why is that tradeoff reasonable for this scenario?
+
+The tradeoff is reasonable for this scenario because a real pet owner usually has no more than 20 tasks per day across all pets. At this small scale, this simpler implemented approach is faster and signaficantly easier to read.
 
 ---
 
