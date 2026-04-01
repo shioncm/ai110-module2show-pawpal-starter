@@ -28,7 +28,12 @@ Yes, my design did slightly change during implementation. The initial UML design
 **a. Constraints and priorities**
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+
+The scheduler considers constraints such as scheduled time, duration, priority, and completion status of tasks. Recurring tasks also carry a frequency and a due date.
+
 - How did you decide which constraints mattered most?
+
+Scheduled time and duration of tasks were prioritized most. Without both, the scheduler cannot detect conflicting tasks. Task priority was added after the core logic was stable since they do not have a large effect on the scheduling logic itself.
 
 **b. Tradeoffs**
 
@@ -47,12 +52,22 @@ The tradeoff is reasonable for this scenario because a real pet owner usually ha
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+
+I used AI to implement class logic from UML skeletons, extend methods with new features, write the pytest suite, and review the code for flaws or improvements to be made.
+
 - What kinds of prompts or questions were most helpful?
+
+Code review prompts were most helpful. Having the AI tool look over the code and find flaws or suggest improvements quickly helped speed up the development immensely.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+
+One moment I did not accept an AI suggestion was when I was connecting the UI to the program logic. Many newly added features were not being reflected in the UI, and the AI prompts needed refinement.
+
 - How did you evaluate or verify what the AI suggested?
+
+Running the test suite helped verify AI suggestions. By immediatly generating tests and verifying them for every new implementation, I was able to guarantee that the program runs correctly for each new feature.
 
 ---
 
@@ -61,12 +76,22 @@ The tradeoff is reasonable for this scenario because a real pet owner usually ha
 **a. What you tested**
 
 - What behaviors did you test?
+
+Behavior I tested include task sort order, filtering by completion status and pet name, daily and weekly task recurrence, and task conflict detection.
+
 - Why were these tests important?
+
+These tests were important because they are essential to the schedule generation and overall function of the program. Many features have an edge case, and it is important to detect them beforehand.
 
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+
+I have high confidence for the core logic. All tests pass and there are many edge-cases covered. However, I have lower confidence for the integration with the UI, which has no automated tests and was only verified manually.
+
 - What edge cases would you test next if you had more time?
+
+If I had more time, an edge case I would test next is two pets with the same name under different owners.
 
 ---
 
@@ -76,10 +101,16 @@ The tradeoff is reasonable for this scenario because a real pet owner usually ha
 
 - What part of this project are you most satisfied with?
 
+I am satisfied with the overall core logic implementation. In particular, the conflict detection and recurrence features work well together. All features necessary are implemented sufficiently.
+
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
 
+I would improve the UI integration, and overall UI experience for the user. The current UI is still clunky and unpolished.
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+One important thing I learned about designing systems is the importance of having an overall structure layed out. In particular, having a draft UML diagram was immensely helpful in implementing the core logic. AI tools were also helpful in this process of drafting the UML diagrams.
