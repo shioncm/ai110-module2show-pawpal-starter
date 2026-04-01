@@ -348,3 +348,90 @@ def test_multiple_conflicts_reported():
 def test_check_conflicts_never_raises_on_empty_scheduler():
     scheduler = Scheduler()
     assert scheduler.check_conflicts() == []
+
+
+# ── edge cases ────────────────────────────────────────────────────────────────
+
+def test_sort_filter_conflicts_pet_with_no_tasks():
+    """A pet registered with zero tasks should not crash any query."""
+    pet = Pet("Ghost", "Cat", age=1)
+    owner = Owner("Alice")
+    owner.add_pet(pet)
+    scheduler = Scheduler()
+    scheduler.register_owner(owner)
+    assert scheduler.sort_tasks_by_time() == []
+    assert scheduler.filter_tasks() == []
+    assert scheduler.check_conflicts() == []
+
+
+def test_sort_tasks_exclude_unscheduled_when_all_are_unscheduled():
+    """include_unscheduled=False with no scheduled tasks returns empty list."""
+    t1 = Task("Groom", duration_minutes=20, priority="low")
+    t2 = Task("Play",  duration_minutes=15, priority="medium")
+    scheduler = _sched_with_tasks((t1, "Biscuit"), (t2, "Biscuit"))
+    result = scheduler.sort_tasks_by_time(include_unscheduled=False)
+    assert result == []
+
+
+def test_complete_task_twice_on_recurring_raises():
+    """Completing a recurring task a second time should raise — the next
+    occurrence with the same due_date is already registered on the pet."""
+    scheduler, pet, task, today = _make_recurring_scheduler("daily")
+    scheduler.complete_task(task)           # marks done, adds day+1
+    assert len(pet.tasks) == 2
+    with pytest.raises(ValueError):
+        scheduler.complete_task(task)       # day+1 already exists → add_task raises
+
+
+def test_all_tasks_completed_means_no_conflicts_and_no_pending():
+    """When every scheduled task is already done, conflicts and pending are empty."""
+    t1 = Task("Walk", duration_minutes=30, priority="high",   scheduled_time=480)
+    t2 = Task("Feed", duration_minutes=30, priority="high",   scheduled_time=490)
+    t1.complete()
+    t2.complete()
+    scheduler = _sched_with_tasks((t1, "Biscuit"), (t2, "Biscuit"))
+    assert scheduler.check_conflicts() == []
+    assert scheduler.get_pending_tasks() == []
+
+
+def test_scheduled_time_str_at_boundary_values():
+    """scheduled_time_str() should format midnight (0) and end-of-day (1439)."""
+    assert Task("A", duration_minutes=10, priority="low", scheduled_time=0).scheduled_time_str() == "00:00"
+    assert Task("B", duration_minutes=10, priority="low", scheduled_time=1439).scheduled_time_str() == "23:59"
+
+
+# ── sorting correctness (chronological order) ─────────────────────────────────
+
+def test_sort_tasks_exact_chronological_order():
+    """Tasks must come back in strict ascending time order, not just 'sorted'."""
+    t1 = Task("Feed",  duration_minutes=10, priority="high",   scheduled_time=420)   # 07:00
+    t2 = Task("Play",  duration_minutes=15, priority="medium", scheduled_time=540)   # 09:00
+    t3 = Task("Walk",  duration_minutes=30, priority="high",   scheduled_time=600)   # 10:00
+    scheduler = _sched_with_tasks((t3, "Biscuit"), (t1, "Biscuit"), (t2, "Biscuit"))
+    result = scheduler.sort_tasks_by_time(include_unscheduled=False)
+    assert [t.scheduled_time for t in result] == [420, 540, 600]
+
+
+# ── recurrence logic ──────────────────────────────────────────────────────────
+
+def test_complete_daily_task_creates_next_day_task():
+    """Completing a daily task must produce exactly one new pending task dated tomorrow."""
+    scheduler, pet, task, today = _make_recurring_scheduler("daily")
+    next_task = scheduler.complete_task(task)
+    assert task.is_completed is True
+    assert next_task is not None
+    assert next_task.due_date == today + datetime.timedelta(days=1)
+    assert next_task.is_completed is False
+    assert len(pet.tasks) == 2
+
+
+# ── conflict detection ────────────────────────────────────────────────────────
+
+def test_conflict_tasks_at_identical_start_time():
+    """Two tasks with the exact same scheduled_time always overlap."""
+    t1 = Task("Feed",  duration_minutes=10, priority="high",   scheduled_time=480)
+    t2 = Task("Groom", duration_minutes=30, priority="medium", scheduled_time=480)
+    scheduler = _sched_with_tasks((t1, "Biscuit"), (t2, "Biscuit"))
+    conflicts = scheduler.check_conflicts()
+    assert len(conflicts) == 1
+    assert "CONFLICT" in conflicts[0]

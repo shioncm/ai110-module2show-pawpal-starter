@@ -44,6 +44,30 @@ The scheduling logic in `pawpal_system.py` has four "smart" features:
 
 **Conflict detection**: `Scheduler.check_conflicts()` scans all pending, scheduled tasks and returns a list of human-readable warning strings for any overlapping time windows. If there are no conflicts the list is empty.
 
+## Testing PawPal+
+
+### Running the tests
+
+```bash
+python -m pytest
+```
+
+### What the tests cover
+
+The test suite (`tests/test_pawpal.py`) contains **44 tests** across five areas:
+
+| Area | What is verified |
+|---|---|
+| **Sorting correctness** | Tasks are returned in strict chronological order regardless of insertion order; unscheduled tasks appear at the end; `include_unscheduled=False` filters them out entirely |
+| **Filtering** | `filter_tasks()` works with no arguments, `is_completed` alone, `pet_name` alone, and both combined; pet name lookup is case-insensitive; an unknown pet name raises `ValueError` |
+| **Recurrence logic** | Completing a `daily` or `weekly` task automatically creates the next occurrence with the correct `due_date`; the generated task inherits all attributes and starts as pending; completing a recurring task twice raises `ValueError` to prevent duplicate occurrences |
+| **Conflict detection** | Overlapping tasks on the same or different pets are flagged; adjacent tasks (end == next start) are not flagged; completed and unscheduled tasks are excluded; tasks at the exact same start time always conflict; an empty scheduler never raises |
+| **Edge cases** | Pet with zero tasks; scheduler with no owners; all tasks already completed; boundary `scheduled_time` values (`00:00` and `23:59`) |
+
+### Confidence level: ★★★★☆
+
+The core logic is well-exercised. Sorting, filtering, recurrence chaining, and conflict detection all have targeted happy-path and edge-case tests. One star is withheld because the Streamlit UI layer (`app.py`) has no automated tests.
+
 ### Suggested workflow
 
 1. Read the scenario carefully and identify requirements and edge cases.
